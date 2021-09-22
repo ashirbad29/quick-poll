@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { DeleteIcon } from '../../../assets/Icons';
 
 type OptionInputTypes = {
@@ -15,7 +16,7 @@ const OptionInput: React.FC<OptionInputTypes> = ({
   showDeleteBtn,
 }) => {
   return (
-    <div className="my-2">
+    <motion.div layout className="my-2" exit={{ opacity: 0 }}>
       <h3 className="text-lg font-semibold text-gray-500 mb-1">Option {optionNumber}</h3>
       <div className="w-full flex gap-3 items-center">
         <input
@@ -31,7 +32,7 @@ const OptionInput: React.FC<OptionInputTypes> = ({
           />
         )}
       </div>
-    </div>
+    </motion.div>
   );
 };
 

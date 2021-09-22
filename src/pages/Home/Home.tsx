@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import useUniqueComponentId from '../../Hooks/useUniqueComponentId';
 import OptionInput from './components/OptionInput';
-
 import { OptionType } from './types';
+import { PlusIcon, SparkleIcon } from '../../assets/Icons';
 
 const Home = () => {
   const getId = useUniqueComponentId();
@@ -54,30 +55,33 @@ const Home = () => {
           </div>
 
           <div>
-            {options.map((option, idx) => (
-              <OptionInput
-                key={option.id}
-                optionNumber={idx + 1}
-                onChange={(val) => handleChange(val, option.id)}
-                onDelete={() => handleDelete(option.id)}
-                showDeleteBtn={options.length > 2}
-              />
-            ))}
-          </div>
-
-          <div className="mt-5 flex gap-4 flex-wrap">
-            <button
-              type="button"
-              onClick={addOption}
-              className="bg-dankPurple px-6 py-2 text-white text-lg font-semibold rounded-md focus:ring-4">
-              Add Another Option
-            </button>
-            <button
-              type="button"
-              onClick={() => {}}
-              className="bg-green-500 px-6 py-2 text-white text-lg font-semibold rounded-md focus:ring-4">
-              Create Your Poll
-            </button>
+            <AnimatePresence>
+              {options.map((option, idx) => (
+                <OptionInput
+                  key={option.id}
+                  optionNumber={idx + 1}
+                  onChange={(val) => handleChange(val, option.id)}
+                  onDelete={() => handleDelete(option.id)}
+                  showDeleteBtn={options.length > 2}
+                />
+              ))}
+            </AnimatePresence>
+            <motion.div layout className="mt-5 flex gap-4 flex-wrap">
+              <button
+                type="button"
+                onClick={addOption}
+                className="bg-dankPurple px-6 py-2 text-white text-lg font-semibold rounded-md focus:ring-4 flex items-center gap-3 hover:opacity-90">
+                <span>Add Another Option</span>
+                <PlusIcon className="h-5 w-5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => {}}
+                className="bg-green-500 px-6 py-2 text-white text-lg font-semibold rounded-md focus:ring-4 flex items-center gap-3 hover:opacity-90">
+                <span>Create Your Poll</span>
+                <SparkleIcon className="h-5 w-5 text-yellow-300" />
+              </button>
+            </motion.div>
           </div>
         </section>
       </div>
