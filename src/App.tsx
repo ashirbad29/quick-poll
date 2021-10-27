@@ -7,6 +7,13 @@ import Admin from './pages/Admin/Admin';
 import Header from './components/layouts/Header';
 
 function App() {
+  // getDocs(roomsRef).then((querySnapshot) => {
+  //   console.log(querySnapshot);
+  //   querySnapshot.forEach((doc) => {
+  //     console.log(doc.id, ' => ', doc.data());
+  //   });
+  // });
+
   return (
     <Router>
       <main className="flex flex-col min-h-screen">

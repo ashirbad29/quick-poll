@@ -1,11 +1,11 @@
 import React from 'react';
 
 const HeaderWrappers = ({ children }: { children: React.ElementType }) => {
-	return (
-		<div>
-			<h1>hello</h1>
-		</div>
-	);
+  return (
+    <div>
+      <h1>{children}</h1>
+    </div>
+  );
 };
 
 export default HeaderWrappers;

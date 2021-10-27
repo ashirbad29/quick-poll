@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { addDoc } from 'firebase/firestore';
 import useUniqueComponentId from '../../Hooks/useUniqueComponentId';
 import OptionInput from './components/OptionInput';
 import { OptionType } from './types';
 import { PlusIcon, SparkleIcon } from '../../assets/Icons';
+
+import { pollsRef } from '../../firebase';
 
 const Home = () => {
   const getId = useUniqueComponentId();
@@ -12,6 +15,18 @@ const Home = () => {
     { id: getId(), input: '' },
   ]);
   const [pollQuestion, setPollQuestion] = useState('');
+
+  const createPoll = async () => {
+    const data = {
+      options: options.map((option) => ({ title: option.input, votes: 0 })),
+      question: pollQuestion,
+      totalVotes: 0,
+    };
+
+    const docRef = await addDoc(pollsRef, data);
+    // console.log('id: ', docRef.id);
+    return docRef;
+  };
 
   const handleChange = (val: string, id: number) => {
     setOptions((o) =>
@@ -76,7 +91,7 @@ const Home = () => {
               </button>
               <button
                 type="button"
-                onClick={() => {}}
+                onClick={createPoll}
                 className="bg-green-500 px-6 py-2 text-white text-lg font-semibold rounded-md focus:ring-4 flex items-center gap-3 hover:opacity-90">
                 <span>Create Your Poll</span>
                 <SparkleIcon className="h-5 w-5 text-yellow-300" />
