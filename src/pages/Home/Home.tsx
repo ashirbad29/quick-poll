@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-// import { addDoc } from 'firebase/firestore';
+import { addDoc } from 'firebase/firestore';
 import clsx from 'clsx';
 import { useHistory } from 'react-router-dom';
 import useUniqueComponentId from '../../Hooks/useUniqueComponentId';
@@ -8,8 +8,8 @@ import OptionInput from './components/OptionInput';
 import { OptionType } from './types';
 import { PlusIcon, SparkleIcon } from '../../assets/Icons';
 
-// import { pollsRef } from '../../firebase';
-import validateString from '../../utils/validateString';
+import { pollsRef } from '../../firebase';
+import { validateString, getRandomString } from '../../utils';
 
 const Home = () => {
   const history = useHistory();
@@ -22,21 +22,20 @@ const Home = () => {
   const [formError, setFormError] = useState(false);
 
   const createPoll = async () => {
-    // const data = {
-    //   options: options.map((option) => ({ title: option.input, votes: 0 })),
-    //   question: pollQuestion,
-    //   totalVotes: 0,
-    // };
-
-    // const docRef = await addDoc(pollsRef, data);
-    // return docRef;
     const userInput = [pollQuestion.trim(), ...options.map((o) => o.input.trim())];
     if (!validateString(...userInput)) {
       setFormError(true);
       return;
     }
+    const data = {
+      options: options.map((option) => ({ title: option.input, votes: 0 })),
+      question: pollQuestion,
+      totalVotes: 0,
+      key: getRandomString(),
+    };
 
-    history.push('/new/fhdsfa777');
+    const docRef = await addDoc(pollsRef, data);
+    history.push(`/new/${docRef.id}`);
   };
 
   const handleChange = (val: string, id: number) => {

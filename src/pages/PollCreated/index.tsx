@@ -33,11 +33,39 @@ const PollCreated = () => {
           value={POLL_URL}
           onClick={() => copyToClipboard(POLL_URL)}
         />
-        <div className="w-full">
+
+        <div className="font-medium mt-5">
+          The Admin Link to manage your poll{' '}
+          <span role="img" aria-label="below">
+            🔒
+          </span>
+          <div className="relative border rounded p-2 bg-gray-100 mt-2 cursor-pointer transition-all hover:bg-gray-200">
+            <input
+              type="text"
+              className="w-full bg-transparent text-gray-200"
+              readOnly
+              value={POLL_URL}
+            />
+            {/* eslint-disable jsx-a11y/no-static-element-interactions */}
+            {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
+            <div
+              className="absolute inset-0 text-center flex items-center justify-center font-bold text-gray-600"
+              onClick={() => copyToClipboard(POLL_URL)}>
+              Click to copy
+            </div>
+          </div>
+        </div>
+
+        <div className="w-full flex justify-end mt-4 gap-6">
           <Link
-            className="font-bold block text-purple-400 hover:text-purple-500 ml-auto w-max mt-4"
+            className="font-bold block text-purple-400 hover:text-purple-500 w-max"
             to={`/poll/${pollId}`}>
             Visit your poll
+          </Link>
+          <Link
+            className="font-bold block text-purple-400 hover:text-purple-500 w-max"
+            to={`/poll/${pollId}/admin`}>
+            Visit admin page
           </Link>
         </div>
       </div>
