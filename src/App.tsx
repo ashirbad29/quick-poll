@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import './App.css';
 
+import { Toaster } from 'react-hot-toast';
 import Home from './pages/Home/Home';
 import Admin from './pages/Admin/Admin';
 import Header from './components/layouts/Header';
@@ -21,6 +22,7 @@ function App() {
         <Route exact path="/" component={Home} />
         <Route exact path="/admin" component={Admin} />
       </main>
+      <Toaster position="top-right" />
     </Router>
   );
 }

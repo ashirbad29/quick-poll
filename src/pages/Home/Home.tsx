@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { addDoc } from 'firebase/firestore';
+// import { addDoc } from 'firebase/firestore';
+import clsx from 'clsx';
 import useUniqueComponentId from '../../Hooks/useUniqueComponentId';
 import OptionInput from './components/OptionInput';
 import { OptionType } from './types';
 import { PlusIcon, SparkleIcon } from '../../assets/Icons';
 
-import { pollsRef } from '../../firebase';
+// import { pollsRef } from '../../firebase';
+import validateString from '../../utils/validateString';
 
 const Home = () => {
   const getId = useUniqueComponentId();
@@ -15,17 +17,21 @@ const Home = () => {
     { id: getId(), input: '' },
   ]);
   const [pollQuestion, setPollQuestion] = useState('');
+  const [formError, setFormError] = useState(false);
 
   const createPoll = async () => {
-    const data = {
-      options: options.map((option) => ({ title: option.input, votes: 0 })),
-      question: pollQuestion,
-      totalVotes: 0,
-    };
+    // const data = {
+    //   options: options.map((option) => ({ title: option.input, votes: 0 })),
+    //   question: pollQuestion,
+    //   totalVotes: 0,
+    // };
 
-    const docRef = await addDoc(pollsRef, data);
-    // console.log('id: ', docRef.id);
-    return docRef;
+    // const docRef = await addDoc(pollsRef, data);
+    // return docRef;
+    const userInput = [pollQuestion.trim(), ...options.map((o) => o.input.trim())];
+    if (!validateString(...userInput)) {
+      setFormError(true);
+    }
   };
 
   const handleChange = (val: string, id: number) => {
@@ -64,9 +70,17 @@ const Home = () => {
               value={pollQuestion}
               onChange={(e) => setPollQuestion(e.target.value)}
               name="questions"
-              className="w-full p-4 text-lg font-medium text-gray-700 focus:ring-4 ring-purple-300 outline-none rounded-md placeholder-gray-300 border resize-none"
+              className={clsx(
+                'w-full p-4 text-lg font-medium text-gray-700 focus:ring-4 ring-purple-300 outline-none rounded-md placeholder-gray-300 border resize-none',
+                { '!ring-4 !ring-red-300': formError && !pollQuestion.trim() },
+              )}
               placeholder="Which is your favorite Programming Language?"
             />
+            {formError && !pollQuestion.trim() && (
+              <span className="!mt-0 text-sm text-red-400 font-medium">
+                This field can&#39;t be empty
+              </span>
+            )}
           </div>
 
           <div>
@@ -74,10 +88,12 @@ const Home = () => {
               {options.map((option, idx) => (
                 <OptionInput
                   key={option.id}
+                  value={option.input}
                   optionNumber={idx + 1}
                   onChange={(val) => handleChange(val, option.id)}
                   onDelete={() => handleDelete(option.id)}
                   showDeleteBtn={options.length > 2}
+                  error={formError}
                 />
               ))}
             </AnimatePresence>
