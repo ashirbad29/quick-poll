@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 // import { addDoc } from 'firebase/firestore';
 import clsx from 'clsx';
+import { useHistory } from 'react-router-dom';
 import useUniqueComponentId from '../../Hooks/useUniqueComponentId';
 import OptionInput from './components/OptionInput';
 import { OptionType } from './types';
@@ -11,6 +12,7 @@ import { PlusIcon, SparkleIcon } from '../../assets/Icons';
 import validateString from '../../utils/validateString';
 
 const Home = () => {
+  const history = useHistory();
   const getId = useUniqueComponentId();
   const [options, setOptions] = useState<OptionType[]>([
     { id: getId(), input: '' },
@@ -31,7 +33,10 @@ const Home = () => {
     const userInput = [pollQuestion.trim(), ...options.map((o) => o.input.trim())];
     if (!validateString(...userInput)) {
       setFormError(true);
+      return;
     }
+
+    history.push('/new/fhdsfa777');
   };
 
   const handleChange = (val: string, id: number) => {
