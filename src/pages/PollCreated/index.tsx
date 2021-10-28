@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-
 import toast from 'react-hot-toast';
+import getPoll from '../../services/getPoll';
+import { PollTypes } from '../../interfaces';
 
 const ORIGIN = window.location.origin;
 
 const PollCreated = () => {
+  const [poll, setPoll] = useState<PollTypes>();
+
   const { id: pollId } = useParams<{ id: string }>();
   const POLL_URL = `${ORIGIN}/poll/${pollId}`;
 
@@ -16,6 +19,25 @@ const PollCreated = () => {
       error: 'oops.. some error occured',
     });
   };
+
+  useEffect(() => {
+    const getPollData = async () => {
+      try {
+        const data = await getPoll(pollId);
+        if (data) {
+          setPoll(data);
+          toast.success('Poll created');
+        }
+      } catch {
+        toast.error('something went wrong');
+      }
+    };
+    getPollData();
+  }, [pollId]);
+
+  if (!poll) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="bg-gray-100 flex-1 flex items-center justify-center">
@@ -50,7 +72,7 @@ const PollCreated = () => {
             {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
             <div
               className="absolute inset-0 text-center flex items-center justify-center font-bold text-gray-600"
-              onClick={() => copyToClipboard(POLL_URL)}>
+              onClick={() => copyToClipboard(`${POLL_URL}/${poll.key}/admin`)}>
               Click to copy
             </div>
           </div>
@@ -64,7 +86,7 @@ const PollCreated = () => {
           </Link>
           <Link
             className="font-bold block text-purple-400 hover:text-purple-500 w-max"
-            to={`/poll/${pollId}/admin`}>
+            to={`/poll/${pollId}/${poll.key}/admin`}>
             Visit admin page
           </Link>
         </div>
