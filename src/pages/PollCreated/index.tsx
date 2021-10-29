@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import getPoll from '../../services/getPoll';
 import { PollTypes } from '../../interfaces';
+import Spinner from '../../components/Spinner';
 
 const ORIGIN = window.location.origin;
 
@@ -36,7 +37,11 @@ const PollCreated = () => {
   }, [pollId]);
 
   if (!poll) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <Spinner height="28px" width="28px" />
+      </div>
+    );
   }
 
   return (

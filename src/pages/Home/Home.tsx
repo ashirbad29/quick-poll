@@ -11,6 +11,8 @@ import { PlusIcon, SparkleIcon } from '../../assets/Icons';
 import { pollsRef } from '../../firebase';
 import { validateString, getRandomString } from '../../utils';
 
+import Spinner from '../../components/Spinner';
+
 const Home = () => {
   const history = useHistory();
   const getId = useUniqueComponentId();
@@ -20,8 +22,10 @@ const Home = () => {
   ]);
   const [pollQuestion, setPollQuestion] = useState('');
   const [formError, setFormError] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const createPoll = async () => {
+    setLoading(true);
     const userInput = [pollQuestion.trim(), ...options.map((o) => o.input.trim())];
     if (!validateString(...userInput)) {
       setFormError(true);
@@ -35,6 +39,7 @@ const Home = () => {
     };
 
     const docRef = await addDoc(pollsRef, data);
+    setLoading(false);
     history.push(`/new/${docRef.id}`);
   };
 
@@ -112,9 +117,14 @@ const Home = () => {
               <button
                 type="button"
                 onClick={createPoll}
-                className="bg-green-500 px-6 py-2 text-white text-lg font-semibold rounded-md focus:ring-4 flex items-center gap-3 hover:opacity-90">
+                className="bg-green-500 relative px-6 py-2 text-white text-lg font-semibold rounded-md focus:ring-4 flex items-center gap-3 hover:opacity-90">
                 <span>Create Your Poll</span>
                 <SparkleIcon className="h-5 w-5 text-yellow-300" />
+                {loading && (
+                  <span className="absolute inset-0 flex items-center justify-center bg-green-500 rounded-md">
+                    <Spinner height="20px" width="20px" />{' '}
+                  </span>
+                )}
               </button>
             </motion.div>
           </div>
