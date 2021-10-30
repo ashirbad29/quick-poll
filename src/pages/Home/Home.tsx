@@ -25,7 +25,6 @@ const Home = () => {
   const [loading, setLoading] = useState(false);
 
   const createPoll = async () => {
-    setLoading(true);
     const userInput = [pollQuestion.trim(), ...options.map((o) => o.input.trim())];
     if (!validateString(...userInput)) {
       setFormError(true);
@@ -38,6 +37,7 @@ const Home = () => {
       key: getRandomString(),
     };
 
+    setLoading(true);
     const docRef = await addDoc(pollsRef, data);
     setLoading(false);
     history.push(`/new/${docRef.id}`);

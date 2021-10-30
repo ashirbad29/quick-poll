@@ -7,7 +7,8 @@ import Home from './pages/Home/Home';
 import Admin from './pages/Admin/Admin';
 import Header from './components/layouts/Header';
 import PollCreated from './pages/PollCreated';
-import LivePoll from './pages/LivePoll';
+import SubmitVotePage from './pages/SubmitVote';
+import PollResults from './pages/PollResults';
 
 function App() {
   // getDocs(roomsRef).then((querySnapshot) => {
@@ -24,7 +25,8 @@ function App() {
         <Route exact path="/" component={Home} />
         <Route exact path="/admin" component={Admin} />
         <Route exact path="/new/:id" component={PollCreated} />
-        <Route exact path="/poll" component={LivePoll} />
+        <Route exact path="/poll/:id" component={SubmitVotePage} />
+        <Route exact path="/poll/result/:id" component={PollResults} />
       </main>
       <Toaster position="top-right" />
     </Router>
