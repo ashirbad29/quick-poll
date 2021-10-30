@@ -1,50 +1,60 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import { increment } from 'firebase/firestore';
 import Spinner from '../../components/Spinner';
 
 import { PollTypes } from '../../interfaces';
 
 import Option from './components/Options';
 import { ChevronRight } from '../../assets/Icons';
-
-const mockApi = async (delay: number = 1000) => {
-  const data: PollTypes = {
-    question: 'which is your favorite anime',
-    options: [
-      { title: 'Attack on Titan', votes: 0 },
-      { title: 'Food Wars', votes: 0 },
-      { title: 'Naruto Sipphuden', votes: 0 },
-    ],
-    totalVotes: 0,
-    key: 'asfdghr54v',
-  };
-
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(data as PollTypes);
-    }, delay);
-  });
-};
+import getPoll from '../../services/getPoll';
+import updatePoll from '../../services/updatePoll';
 
 const SubmitVote = () => {
-  const [loading, setLoading] = useState(false);
-  const [poll, setPoll] = useState<PollTypes>();
+  // const [loading, setLoading] = useState(false);
+  const [poll, setPoll] = useState<PollTypes | null>(null);
   const [selectedOption, setSelectedOption] = useState(-1);
 
-  const { id } = useParams<{ id: string }>();
+  const { id: pollId } = useParams<{ id: string }>();
 
   useEffect(() => {
     const fetchPoll = async () => {
-      setLoading(true);
-      const data = await mockApi(1000);
-      setPoll(data as PollTypes);
-      setLoading(false);
+      try {
+        const pollData = await getPoll(pollId);
+        if (pollData) {
+          setPoll(pollData);
+        } else {
+          toast.error('Poll does not exists');
+        }
+      } catch {
+        toast.error('Someting went wrong');
+      }
     };
 
     fetchPoll();
-  }, [id]);
+  }, [pollId]);
 
-  if (loading) {
+  const handleVote = async (id: number) => {
+    if (id === -1) {
+      toast.error('select a option');
+      return;
+    }
+    const options = poll?.options.map((opt) =>
+      opt.opt_id === id ? { ...opt, votes: opt.votes + 1 } : opt,
+    );
+    try {
+      toast.promise(updatePoll(pollId, { options, totalVotes: increment(1) }), {
+        success: 'your vote casted sucessfuly',
+        loading: 'Adding your vote...',
+        error: 'someting went wrong',
+      });
+    } catch {
+      toast.error('something went wrong');
+    }
+  };
+
+  if (!poll) {
     return (
       <div className="bg-gray-100 flex-1 flex items-center justify-center">
         <Spinner height="28px" width="28px" />
@@ -57,13 +67,12 @@ const SubmitVote = () => {
       <div className="w-full sm:w-11/12 max-w-3xl mx-auto p-4 mt-8">
         <h2 className="text-2xl font-bold">{poll?.question}</h2>
         <div className="mt-8 flex flex-col gap-5 items-center justify-center">
-          {poll?.options.map((option, idx) => (
+          {poll?.options.map((option) => (
             <Option
-              // eslint-disable-next-line react/no-array-index-key
-              key={idx}
+              key={option.opt_id}
               title={option.title}
-              isSelected={idx === selectedOption}
-              onSelect={() => setSelectedOption(idx)}
+              isSelected={option.opt_id === selectedOption}
+              onSelect={() => setSelectedOption(option.opt_id)}
             />
           ))}
         </div>
@@ -71,7 +80,7 @@ const SubmitVote = () => {
         <div className="mt-8 w-full flex gap-3">
           <button
             type="button"
-            onClick={() => {}}
+            onClick={() => handleVote(selectedOption)}
             className="bg-green-500 relative px-6 py-2 text-white text-lg font-semibold rounded-md focus:ring-4 flex items-center gap-3 hover:opacity-90">
             <span>Submit your Vote</span>
             {false && (
