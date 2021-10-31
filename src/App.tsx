@@ -11,13 +11,6 @@ import SubmitVotePage from './pages/SubmitVote';
 import PollResults from './pages/PollResults';
 
 function App() {
-  // getDocs(roomsRef).then((querySnapshot) => {
-  //   console.log(querySnapshot);
-  //   querySnapshot.forEach((doc) => {
-  //     console.log(doc.id, ' => ', doc.data());
-  //   });
-  // });
-
   return (
     <Router>
       <main className="flex flex-col min-h-screen">
