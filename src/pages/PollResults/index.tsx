@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { AnimateSharedLayout } from 'framer-motion';
 import OptionProgress from './components/OptionProgress';
 import useLocalStorage from '../../Hooks/useLocalStorage';
 import Spinner from '../../components/Spinner';
@@ -10,7 +11,6 @@ import useRealtimePoll from '../../services/getRealtimePoll';
 
 const PollResults = () => {
   const { id: pollId } = useParams<{ id: string }>();
-  // const [poll, setPoll] = useState<PollTypes>();
   const [userOption, setUserOption] = useState<string | undefined>(undefined);
   const [userVotes] = useLocalStorage<{ poll_id: string; opt_id: number }[]>(
     'user_votes',
@@ -45,14 +45,19 @@ const PollResults = () => {
         <h1 className="text-gray-800 font-bold text-3xl max-w-prose">{poll?.question}</h1>
         <div className="mt-8 flex flex-col md:flex-row">
           <div className="flex flex-col gap-6 w-full md:w-2/3">
-            {poll?.options.map((opt) => (
-              <OptionProgress
-                key={opt.opt_id}
-                title={opt.title}
-                votes={opt.votes}
-                percentage={getPercentage(opt.votes, poll.totalVotes)}
-              />
-            ))}
+            <AnimateSharedLayout>
+              {poll?.options
+                .sort((a, b) => b.votes - a.votes)
+                .map((opt) => (
+                  <OptionProgress
+                    key={opt.opt_id}
+                    layoutId={opt.opt_id}
+                    title={opt.title}
+                    votes={opt.votes}
+                    percentage={getPercentage(opt.votes, poll.totalVotes)}
+                  />
+                ))}
+            </AnimateSharedLayout>
           </div>
           <div className="w-full fixed bottom-0 left-0 bg-white flex flex-col-reverse p-4 mt-9 md:mt-0 md:ml-16 md:w-1/3 md:static md:flex-col md:bg-transparent">
             {userOption ? (
