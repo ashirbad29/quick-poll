@@ -10,13 +10,25 @@ import Option from './components/Options';
 import { ChevronRight } from '../../assets/Icons';
 import getPoll from '../../services/getPoll';
 import updatePoll from '../../services/updatePoll';
+import useLocalStorage from '../../Hooks/useLocalStorage';
 
 const SubmitVote = () => {
-  // const [loading, setLoading] = useState(false);
   const [poll, setPoll] = useState<PollTypes | null>(null);
   const [selectedOption, setSelectedOption] = useState(-1);
+  const [voteCasted, setVoteCasted] = useState(false);
+  const [userVotes, setUserVotes] = useLocalStorage<
+    { poll_id: string; opt_id: number }[]
+  >('user_votes', []);
 
   const { id: pollId } = useParams<{ id: string }>();
+
+  useEffect(() => {
+    const vote = userVotes.find((v) => v.poll_id === pollId);
+    if (vote) {
+      setVoteCasted(true);
+      setSelectedOption(vote.opt_id);
+    }
+  }, [pollId, userVotes]);
 
   useEffect(() => {
     const fetchPoll = async () => {
@@ -36,6 +48,10 @@ const SubmitVote = () => {
   }, [pollId]);
 
   const handleVote = async (id: number) => {
+    if (voteCasted) {
+      toast.error('Already Voted');
+      return;
+    }
     if (id === -1) {
       toast.error('select a option');
       return;
@@ -49,6 +65,7 @@ const SubmitVote = () => {
         loading: 'Adding your vote...',
         error: 'someting went wrong',
       });
+      setUserVotes([...userVotes, { poll_id: pollId, opt_id: id }]);
     } catch {
       toast.error('something went wrong');
     }
@@ -72,6 +89,7 @@ const SubmitVote = () => {
               key={option.opt_id}
               title={option.title}
               isSelected={option.opt_id === selectedOption}
+              disabled={voteCasted}
               onSelect={() => setSelectedOption(option.opt_id)}
             />
           ))}
@@ -81,7 +99,8 @@ const SubmitVote = () => {
           <button
             type="button"
             onClick={() => handleVote(selectedOption)}
-            className="bg-green-500 relative px-6 py-2 text-white text-lg font-semibold rounded-md focus:ring-4 flex items-center gap-3 hover:opacity-90">
+            disabled={voteCasted}
+            className="bg-green-500 relative px-6 py-2 text-white text-lg font-semibold rounded-md focus:ring-4 flex items-center gap-3 hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed">
             <span>Submit your Vote</span>
             {false && (
               <span className="absolute inset-0 flex items-center justify-center bg-green-500 rounded-md">
@@ -99,10 +118,12 @@ const SubmitVote = () => {
                 <ChevronRight className="h-6 w-6 text-gray-500 ml-2" />
               </span>
             </button>
-            <span className="flex absolute h-3 w-3 top-0 right-0 -mt-1 -mr-1">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-purple-500" />
-            </span>
+            {voteCasted && (
+              <span className="flex absolute h-3 w-3 top-0 right-0 -mt-1 -mr-1">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-purple-500" />
+              </span>
+            )}
           </div>
         </div>
       </div>
