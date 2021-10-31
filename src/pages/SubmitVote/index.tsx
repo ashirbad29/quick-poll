@@ -4,16 +4,18 @@ import toast from 'react-hot-toast';
 import { increment } from 'firebase/firestore';
 import Spinner from '../../components/Spinner';
 
-import { PollTypes } from '../../interfaces';
+// import { PollTypes } from '../../interfaces';
 
 import Option from './components/Options';
 import { ChevronRight } from '../../assets/Icons';
-import getPoll from '../../services/getPoll';
+// import getPoll from '../../services/getPoll';
 import updatePoll from '../../services/updatePoll';
 import useLocalStorage from '../../Hooks/useLocalStorage';
 
+import useRealtimePoll from '../../services/getRealtimePoll';
+
 const SubmitVote = () => {
-  const [poll, setPoll] = useState<PollTypes | null>(null);
+  // const [poll, setPoll] = useState<PollTypes | null>(null);
   const [selectedOption, setSelectedOption] = useState(-1);
   const [voteCasted, setVoteCasted] = useState(false);
   const [userVotes, setUserVotes] = useLocalStorage<
@@ -30,22 +32,7 @@ const SubmitVote = () => {
     }
   }, [pollId, userVotes]);
 
-  useEffect(() => {
-    const fetchPoll = async () => {
-      try {
-        const pollData = await getPoll(pollId);
-        if (pollData) {
-          setPoll(pollData);
-        } else {
-          toast.error('Poll does not exists');
-        }
-      } catch {
-        toast.error('Someting went wrong');
-      }
-    };
-
-    fetchPoll();
-  }, [pollId]);
+  const [poll] = useRealtimePoll(pollId);
 
   const handleVote = async (id: number) => {
     if (voteCasted) {
@@ -61,11 +48,13 @@ const SubmitVote = () => {
     );
     try {
       toast.promise(updatePoll(pollId, { options, totalVotes: increment(1) }), {
-        success: 'your vote casted sucessfuly',
+        success: () => {
+          setUserVotes([...userVotes, { poll_id: pollId, opt_id: id }]);
+          return `Your vote submitted`;
+        },
         loading: 'Adding your vote...',
-        error: 'someting went wrong',
+        error: 'something went wrong',
       });
-      setUserVotes([...userVotes, { poll_id: pollId, opt_id: id }]);
     } catch {
       toast.error('something went wrong');
     }
