@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { increment } from 'firebase/firestore';
 import Spinner from '../../components/Spinner';
@@ -108,23 +108,24 @@ const SubmitVote = () => {
               </span>
             )}
           </button>
-
-          <div className="relative inline-flex rounded-md shadow-sm ml-auto">
-            <button
-              type="button"
-              className="inline-flex items-center px-4 py-2 border-2 border-gray-200 text-lg leading-6 font-medium rounded-md text-gray-500 bg-white hover:text-purple-700 focus:border-purple-300 transition ease-in-out duration-150">
-              View Results
-              <span>
-                <ChevronRight className="h-6 w-6 text-gray-500 ml-2" />
-              </span>
-            </button>
-            {voteCasted && (
-              <span className="flex absolute h-3 w-3 top-0 right-0 -mt-1 -mr-1">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-purple-500" />
-              </span>
-            )}
-          </div>
+          <Link to={`/poll/result/${pollId}`} className="ml-auto">
+            <div className="relative inline-flex rounded-md shadow-sm">
+              <button
+                type="button"
+                className="inline-flex items-center px-4 py-2 border-2 border-gray-200 text-lg leading-6 font-medium rounded-md text-gray-500 bg-white hover:text-purple-700 focus:border-purple-300 transition ease-in-out duration-150">
+                View Results
+                <span>
+                  <ChevronRight className="h-6 w-6 text-gray-500 ml-2" />
+                </span>
+              </button>
+              {voteCasted && (
+                <span className="flex absolute h-3 w-3 top-0 right-0 -mt-1 -mr-1">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-purple-500" />
+                </span>
+              )}
+            </div>
+          </Link>
         </div>
       </div>
     </div>
