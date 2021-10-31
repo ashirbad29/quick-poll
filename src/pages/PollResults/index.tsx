@@ -1,40 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { PollTypes } from '../../interfaces';
 import OptionProgress from './components/OptionProgress';
 import useLocalStorage from '../../Hooks/useLocalStorage';
 import Spinner from '../../components/Spinner';
 
 import { TwitterIcon, WhatsAppIcon } from '../../assets/brandIcons';
 
-const mockApi = async (delay: number = 1000) => {
-  const data: PollTypes = {
-    question: 'which is your favorite anime',
-    options: [
-      { title: 'Attack on Titan', votes: 137, opt_id: 1 },
-      { title: 'Food Wars', votes: 113, opt_id: 2 },
-      { title: 'Naruto Sipphuden', votes: 81, opt_id: 3 },
-      { title: 'Naruto Sipphuden', votes: 57, opt_id: 4 },
-    ],
-    totalVotes: 388,
-    key: 'asfdghr54v',
-  };
-
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(data as PollTypes);
-    }, delay);
-  });
-};
+import useRealtimePoll from '../../services/getRealtimePoll';
 
 const PollResults = () => {
   const { id: pollId } = useParams<{ id: string }>();
-  const [poll, setPoll] = useState<PollTypes>();
+  // const [poll, setPoll] = useState<PollTypes>();
   const [userOption, setUserOption] = useState<string | undefined>(undefined);
   const [userVotes] = useLocalStorage<{ poll_id: string; opt_id: number }[]>(
     'user_votes',
     [],
   );
+
+  const [poll] = useRealtimePoll(pollId);
 
   useEffect(() => {
     const vote = userVotes.find((v) => v.poll_id === pollId);
@@ -43,14 +26,6 @@ const PollResults = () => {
       setUserOption(option?.title);
     }
   }, [pollId, userVotes, poll?.options]);
-
-  useEffect(() => {
-    const fetchPoll = async () => {
-      const data = await mockApi(1000);
-      setPoll(data as PollTypes);
-    };
-    fetchPoll();
-  }, [pollId]);
 
   const getPercentage = (x: number, total: number): number => {
     return Math.round((x / total) * 100);
