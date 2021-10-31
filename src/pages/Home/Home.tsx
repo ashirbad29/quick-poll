@@ -10,32 +10,36 @@ import { PlusIcon, SparkleIcon } from '../../assets/Icons';
 
 import { pollsRef } from '../../firebase';
 import { validateString, getRandomString } from '../../utils';
-
+import { PollTypes } from '../../interfaces';
 import Spinner from '../../components/Spinner';
 
 const Home = () => {
   const history = useHistory();
   const getId = useUniqueComponentId();
   const [options, setOptions] = useState<OptionType[]>([
-    { id: getId(), input: '' },
-    { id: getId(), input: '' },
+    { id: getId(), title: '' },
+    { id: getId(), title: '' },
   ]);
   const [pollQuestion, setPollQuestion] = useState('');
   const [formError, setFormError] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const createPoll = async () => {
-    const userInput = [pollQuestion.trim(), ...options.map((o) => o.input.trim())];
+    const userInput = [pollQuestion.trim(), ...options.map((o) => o.title.trim())];
     if (!validateString(...userInput)) {
       setFormError(true);
       return;
     }
     const data = {
-      options: options.map((option) => ({ title: option.input, votes: 0 })),
+      options: options.map((opt) => ({
+        title: opt.title,
+        votes: 0,
+        opt_id: opt.id,
+      })),
       question: pollQuestion,
       totalVotes: 0,
       key: getRandomString(),
-    };
+    } as PollTypes;
 
     setLoading(true);
     const docRef = await addDoc(pollsRef, data);
@@ -45,7 +49,7 @@ const Home = () => {
 
   const handleChange = (val: string, id: number) => {
     setOptions((o) =>
-      o.map((option) => (option.id === id ? { ...option, input: val } : option)),
+      o.map((option) => (option.id === id ? { ...option, title: val } : option)),
     );
   };
 
@@ -54,7 +58,7 @@ const Home = () => {
   };
 
   const addOption = () => {
-    setOptions((o) => [...o, { id: getId(), input: '' }]);
+    setOptions((o) => [...o, { id: getId(), title: '' }]);
   };
 
   return (
@@ -97,7 +101,7 @@ const Home = () => {
               {options.map((option, idx) => (
                 <OptionInput
                   key={option.id}
-                  value={option.input}
+                  value={option.title}
                   optionNumber={idx + 1}
                   onChange={(val) => handleChange(val, option.id)}
                   onDelete={() => handleDelete(option.id)}

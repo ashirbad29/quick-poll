@@ -1,4 +1,4 @@
 export type OptionType = {
   id: number;
-  input: string;
+  title: string;
 };
