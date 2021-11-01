@@ -1,21 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { increment } from 'firebase/firestore';
 import Spinner from '../../components/Spinner';
-
-// import { PollTypes } from '../../interfaces';
 
 import Option from './components/Options';
 import { ChevronRight } from '../../assets/Icons';
-// import getPoll from '../../services/getPoll';
-import updatePoll from '../../services/updatePoll';
 import useLocalStorage from '../../Hooks/useLocalStorage';
 
 import useRealtimePoll from '../../services/getRealtimePoll';
+import pollTransaction from '../../services/pollTransaction';
+import myLog from '../../utils/myLog';
 
 const SubmitVote = () => {
-  // const [poll, setPoll] = useState<PollTypes | null>(null);
   const [selectedOption, setSelectedOption] = useState(-1);
   const [voteCasted, setVoteCasted] = useState(false);
   const [userVotes, setUserVotes] = useLocalStorage<
@@ -43,21 +39,18 @@ const SubmitVote = () => {
       toast.error('select a option');
       return;
     }
-    const options = poll?.options.map((opt) =>
-      opt.opt_id === id ? { ...opt, votes: opt.votes + 1 } : opt,
-    );
-    try {
-      toast.promise(updatePoll(pollId, { options, totalVotes: increment(1) }), {
-        success: () => {
-          setUserVotes([...userVotes, { poll_id: pollId, opt_id: id }]);
-          return `Your vote submitted`;
-        },
-        loading: 'Adding your vote...',
-        error: 'something went wrong',
-      });
-    } catch {
-      toast.error('something went wrong');
-    }
+
+    toast.promise(pollTransaction(pollId, id), {
+      success: () => {
+        setUserVotes([...userVotes, { poll_id: pollId, opt_id: id }]);
+        return `Your vote submitted`;
+      },
+      loading: 'Adding your vote...',
+      error: (err) => {
+        myLog(err.message);
+        return 'Unable to submit, try again';
+      },
+    });
   };
 
   if (!poll) {
@@ -89,7 +82,7 @@ const SubmitVote = () => {
             type="button"
             onClick={() => handleVote(selectedOption)}
             disabled={voteCasted}
-            className="bg-green-500 relative px-6 py-2 text-white text-lg font-semibold rounded-md focus:ring-4 flex items-center gap-3 hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed">
+            className="bg-green-500 relative px-6 py-2 text-white text-sm sm:text-lg font-semibold rounded-md focus:ring-4 flex items-center gap-3 hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed">
             <span>Submit your Vote</span>
             {false && (
               <span className="absolute inset-0 flex items-center justify-center bg-green-500 rounded-md">
@@ -101,7 +94,7 @@ const SubmitVote = () => {
             <div className="relative inline-flex rounded-md shadow-sm">
               <button
                 type="button"
-                className="inline-flex items-center px-4 py-2 border-2 border-gray-200 text-lg leading-6 font-medium rounded-md text-gray-500 bg-white hover:text-purple-700 focus:border-purple-300 transition ease-in-out duration-150">
+                className="inline-flex items-center px-4 py-2 border-2 border-gray-200 text-sm sm:text-lg leading-6 font-medium rounded-md text-gray-500 bg-white hover:text-purple-700 focus:border-purple-300 transition ease-in-out duration-150">
                 View Results
                 <span>
                   <ChevronRight className="h-6 w-6 text-gray-500 ml-2" />
