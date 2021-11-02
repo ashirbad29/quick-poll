@@ -10,6 +10,7 @@ import useLocalStorage from '../../Hooks/useLocalStorage';
 import useRealtimePoll from '../../services/getRealtimePoll';
 import pollTransaction from '../../services/pollTransaction';
 import myLog from '../../utils/myLog';
+import DoesNotExists from '../../components/DoesNotExists';
 
 const SubmitVote = () => {
   const [selectedOption, setSelectedOption] = useState(-1);
@@ -28,7 +29,7 @@ const SubmitVote = () => {
     }
   }, [pollId, userVotes]);
 
-  const [poll] = useRealtimePoll(pollId);
+  const [poll, isPollExists] = useRealtimePoll(pollId);
 
   const handleVote = async (id: number) => {
     if (voteCasted) {
@@ -53,7 +54,11 @@ const SubmitVote = () => {
     });
   };
 
-  if (!poll) {
+  if (!isPollExists) {
+    return <DoesNotExists message="Poll Not Found" />;
+  }
+
+  if (!poll && isPollExists) {
     return (
       <div className="bg-gray-100 flex-1 flex items-center justify-center">
         <Spinner height="28px" width="28px" />

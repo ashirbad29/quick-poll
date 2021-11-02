@@ -4,12 +4,17 @@ import { db } from '../firebase';
 import { PollTypes } from '../interfaces';
 
 const useRealtimePoll = (id: string) => {
-  const [poll, setPoll] = useState<PollTypes>();
+  const [poll, setPoll] = useState<PollTypes | null>(null);
+  const [isExists, setIsExists] = useState<boolean>(true);
 
   useEffect(() => {
     const docRef = doc(db, 'polls', id);
     const unSub = onSnapshot(docRef, (pollData) => {
-      setPoll(pollData.data() as PollTypes);
+      if (!pollData.exists()) {
+        setIsExists(false);
+      } else {
+        setPoll(pollData.data() as PollTypes);
+      }
     });
 
     return () => {
@@ -17,7 +22,7 @@ const useRealtimePoll = (id: string) => {
     };
   }, [id]);
 
-  return [poll] as const;
+  return [poll, isExists] as const;
 };
 
 export default useRealtimePoll;

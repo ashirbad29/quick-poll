@@ -8,6 +8,7 @@ import Spinner from '../../components/Spinner';
 import { TwitterIcon, WhatsAppIcon } from '../../assets/brandIcons';
 
 import useRealtimePoll from '../../services/getRealtimePoll';
+import DoesNotExists from '../../components/DoesNotExists';
 
 const PollResults = () => {
   const { id: pollId } = useParams<{ id: string }>();
@@ -17,7 +18,7 @@ const PollResults = () => {
     [],
   );
 
-  const [poll] = useRealtimePoll(pollId);
+  const [poll, isPollExists] = useRealtimePoll(pollId);
 
   useEffect(() => {
     const vote = userVotes.find((v) => v.poll_id === pollId);
@@ -28,10 +29,15 @@ const PollResults = () => {
   }, [pollId, userVotes, poll?.options]);
 
   const getPercentage = (x: number, total: number): number => {
+    if (total === 0) return 0;
     return Math.round((x / total) * 100);
   };
 
-  if (!poll) {
+  if (!isPollExists) {
+    return <DoesNotExists message="Poll Not Found" />;
+  }
+
+  if (!poll && isPollExists) {
     return (
       <div className="bg-gray-100 flex-1 flex items-center justify-center">
         <Spinner height="28px" width="28px" />
@@ -51,7 +57,7 @@ const PollResults = () => {
                 .map((opt) => (
                   <OptionProgress
                     key={opt.opt_id}
-                    layoutId={opt.opt_id}
+                    layoutId={opt.opt_id || ''}
                     title={opt.title}
                     votes={opt.votes}
                     percentage={getPercentage(opt.votes, poll.totalVotes)}
@@ -74,7 +80,7 @@ const PollResults = () => {
             <div className="w-full bg-white pb-3 rounded-md md:mt-6 md:last:px-4 md:py-2 shadow-sm flex md:flex-col">
               <div className="w-full flex flex-col">
                 <span className="font-semibold text-gray-500">Total Votes</span>
-                <span className="text-2xl font-bold">{poll.totalVotes}</span>
+                <span className="text-2xl font-bold">{poll?.totalVotes}</span>
               </div>
               <div className="mt-3 flex md:flex-col gap-4">
                 <a
