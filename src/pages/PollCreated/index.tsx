@@ -61,10 +61,15 @@ const PollCreated = () => {
           onClick={() => copyToClipboard(POLL_URL)}
         />
 
-        <div className="font-medium mt-5">
-          The Admin Link to manage your poll{' '}
-          <span role="img" aria-label="below">
-            🔒
+        {/* <div className="font-medium mt-5">
+          <p>
+            The Admin Link to manage your poll{' '}
+            <span role="img" aria-label="below">
+              🔒
+            </span>
+          </p>
+          <span className="text-sm text-yellow-400">
+            Dont share this Link with your participant
           </span>
           <div className="relative border rounded p-2 bg-gray-100 mt-2 cursor-pointer transition-all hover:bg-gray-200">
             <input
@@ -73,27 +78,27 @@ const PollCreated = () => {
               readOnly
               value={POLL_URL}
             />
-            {/* eslint-disable jsx-a11y/no-static-element-interactions */}
-            {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
             <div
               className="absolute inset-0 text-center flex items-center justify-center font-bold text-gray-600"
               onClick={() => copyToClipboard(`${POLL_URL}/${poll.key}/admin`)}>
               Click to copy
             </div>
           </div>
-        </div>
+        </div> */}
 
+        {/* eslint-disable jsx-a11y/no-static-element-interactions */}
+        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
         <div className="w-full flex justify-end mt-4 gap-6">
           <Link
             className="font-bold block text-purple-400 hover:text-purple-500 w-max"
             to={`/poll/${pollId}`}>
             Visit your poll
           </Link>
-          <Link
+          {/* <Link
             className="font-bold block text-purple-400 hover:text-purple-500 w-max"
             to={`/poll/${pollId}/${poll.key}/admin`}>
             Visit admin page
-          </Link>
+          </Link> */}
         </div>
       </div>
     </div>

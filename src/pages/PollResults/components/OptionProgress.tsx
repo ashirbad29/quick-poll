@@ -16,6 +16,7 @@ const OptionProgress: React.FC<OptionProgressTypes> = ({
 }) => {
   return (
     <motion.div
+      key={layoutId}
       layoutId={layoutId.toString()}
       className="p-6 bg-white shadow-lg rounded-md  text-gray-800">
       <div className="w-full flex mb-3">
