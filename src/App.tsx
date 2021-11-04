@@ -1,6 +1,5 @@
 import React from 'react';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
-import './App.css';
 
 import { Toaster } from 'react-hot-toast';
 import Home from './pages/Home/Home';

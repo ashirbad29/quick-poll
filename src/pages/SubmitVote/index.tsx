@@ -9,7 +9,7 @@ import useLocalStorage from '../../Hooks/useLocalStorage';
 
 import useRealtimePoll from '../../services/getRealtimePoll';
 import pollTransaction from '../../services/pollTransaction';
-import myLog from '../../utils/myLog';
+import { myLog } from '../../utils';
 import DoesNotExists from '../../components/DoesNotExists';
 
 const SubmitVote = () => {
