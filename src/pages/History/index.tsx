@@ -1,29 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import useLocalStorage from '../../Hooks/useLocalStorage';
-// import getAllPolls from '../../services/getPolls';
+import getAllPolls from '../../services/getPolls';
 import { PollTypes } from '../../interfaces';
 import { myLog } from '../../utils';
 import Spinner from '../../components/Spinner';
-// import mockApi from '../../utils/mockApi';
 import DoesNotExists from '../../components/DoesNotExists';
+import PollHistoryCard from './components/PollHistoryCard';
+import deletePoll from '../../services/deletePoll';
 
 const History = () => {
   const [userPolls, setUserPolls] = useState<PollTypes[]>();
-  const [userVotes] = useLocalStorage<{ poll_id: string; opt_id: number }[]>(
-    'user_votes',
-    [],
-  );
+  const [userVotes, setUserVotes] = useLocalStorage<
+    { poll_id: string; opt_id: number }[]
+  >('user_votes', []);
 
   useEffect(() => {
     const fetchPolls = async () => {
       try {
-        // const pollsData = await getAllPolls();
-        // const filteredData = pollsData.filter((poll) =>
-        //   userVotes.some((o) => o.poll_id === poll.id),
-        // );
-        // const filteredData = await mockApi();
-        setUserPolls([]);
+        const pollsData = await getAllPolls();
+        const filteredData = pollsData.filter((poll) =>
+          userVotes.some((o) => o.poll_id === poll.id),
+        );
+        setUserPolls(filteredData as PollTypes[]);
       } catch (e: any) {
         myLog(e.message);
         throw new Error(e.message);
@@ -32,6 +32,20 @@ const History = () => {
 
     fetchPolls();
   }, [userVotes]);
+
+  const deletePollLocal = (id: string) => {
+    toast.promise(deletePoll(id), {
+      success: () => {
+        setUserVotes((state) => state.filter((o) => o.poll_id !== id));
+        return 'Poll deleted successfuly';
+      },
+      loading: 'Deleting poll...',
+      error: (err) => {
+        myLog(err.message);
+        return 'Something went wrong';
+      },
+    });
+  };
 
   if (!userPolls) {
     return (
@@ -58,11 +72,21 @@ const History = () => {
 
   return (
     <div className="flex-1 bg-gray-100">
-      <div className="max-w-5xl mx-auto mt-9 px-4 mb-9">
-        <h1 className="text-gray-800 font-bold text-xl max-w-prose">
+      <div className="max-w-2xl mx-auto mt-9 px-4 mb-9">
+        <h1 className="text-gray-800 font-bold text-2xl max-w-prose">
           Polls you&#39;ve created recently
         </h1>
-        <p>{JSON.stringify(userPolls)}</p>
+        <div className="mt-5 flex flex-col gap-6">
+          {userPolls.map((poll) => (
+            <PollHistoryCard
+              key={poll.id}
+              id={poll.id || ''}
+              question={poll.question}
+              votes={poll.totalVotes}
+              deletePoll={() => deletePollLocal(poll.id || '')}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
