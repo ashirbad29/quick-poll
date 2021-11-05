@@ -15,7 +15,7 @@ const mockApi = async (delay: number = 1000) => {
 
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve(data as PollTypes);
+      resolve([data, data, data] as PollTypes[]);
     }, delay);
   });
 };

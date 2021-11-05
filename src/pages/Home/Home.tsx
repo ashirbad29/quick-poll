@@ -3,15 +3,17 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { addDoc } from 'firebase/firestore';
 import clsx from 'clsx';
 import { useHistory } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import useUniqueComponentId from '../../Hooks/useUniqueComponentId';
 import OptionInput from './components/OptionInput';
 import { OptionType } from './types';
 import { PlusIcon, SparkleIcon } from '../../assets/Icons';
 
 import { pollsRef } from '../../firebase';
-import { validateString, getRandomString } from '../../utils';
+import { validateString, getRandomString, myLog } from '../../utils';
 import { PollTypes } from '../../interfaces';
 import Spinner from '../../components/Spinner';
+import useLocalStorage from '../../Hooks/useLocalStorage';
 
 const Home = () => {
   const history = useHistory();
@@ -20,6 +22,7 @@ const Home = () => {
     { id: getId(), title: '' },
     { id: getId(), title: '' },
   ]);
+  const [userPolls, setUserPolls] = useLocalStorage<string[]>('user_polls', []);
   const [pollQuestion, setPollQuestion] = useState('');
   const [formError, setFormError] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -40,11 +43,16 @@ const Home = () => {
       totalVotes: 0,
       key: getRandomString(),
     } as PollTypes;
-
-    setLoading(true);
-    const docRef = await addDoc(pollsRef, data);
-    setLoading(false);
-    history.push(`/new/${docRef.id}`);
+    try {
+      setLoading(true);
+      const docRef = await addDoc(pollsRef, data);
+      setLoading(false);
+      setUserPolls([...userPolls, docRef.id]);
+      history.push(`/new/${docRef.id}`);
+    } catch (e) {
+      myLog(e);
+      toast.error('something went wrong');
+    }
   };
 
   const handleChange = (val: string, id: number) => {

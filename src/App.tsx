@@ -1,6 +1,5 @@
 import React from 'react';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
-import './App.css';
 
 import { Toaster } from 'react-hot-toast';
 import Home from './pages/Home/Home';
@@ -9,6 +8,7 @@ import Header from './components/layouts/Header';
 import PollCreated from './pages/PollCreated';
 import SubmitVotePage from './pages/SubmitVote';
 import PollResults from './pages/PollResults';
+import History from './pages/History';
 
 function App() {
   return (
@@ -20,6 +20,7 @@ function App() {
         <Route exact path="/new/:id" component={PollCreated} />
         <Route exact path="/poll/:id" component={SubmitVotePage} />
         <Route exact path="/poll/result/:id" component={PollResults} />
+        <Route exact path="/history" component={History} />
       </main>
       <Toaster position="top-right" />
     </Router>
