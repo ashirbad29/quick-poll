@@ -12,16 +12,14 @@ import deletePoll from '../../services/deletePoll';
 
 const History = () => {
   const [userPolls, setUserPolls] = useState<PollTypes[]>();
-  const [userVotes, setUserVotes] = useLocalStorage<
-    { poll_id: string; opt_id: number }[]
-  >('user_votes', []);
+  const [userPollsLocal, setUserPollsLocal] = useLocalStorage<string[]>('user_polls', []);
 
   useEffect(() => {
     const fetchPolls = async () => {
       try {
         const pollsData = await getAllPolls();
         const filteredData = pollsData.filter((poll) =>
-          userVotes.some((o) => o.poll_id === poll.id),
+          userPollsLocal.some((poll_id) => poll_id === poll.id),
         );
         setUserPolls(filteredData as PollTypes[]);
       } catch (e: any) {
@@ -31,12 +29,14 @@ const History = () => {
     };
 
     fetchPolls();
-  }, [userVotes]);
+  }, [userPollsLocal]);
 
   const deletePollLocal = (id: string) => {
     toast.promise(deletePoll(id), {
       success: () => {
-        setUserVotes((state) => state.filter((o) => o.poll_id !== id));
+        setUserPollsLocal((local_polls) =>
+          local_polls.filter((poll_id) => poll_id !== id),
+        );
         return 'Poll deleted successfuly';
       },
       loading: 'Deleting poll...',
@@ -58,7 +58,7 @@ const History = () => {
   if (userPolls?.length === 0) {
     return (
       <div className="flex-1 bg-gray-100 flex flex-col items-center justify-center">
-        <DoesNotExists message="Such Empty" />
+        <DoesNotExists message="Wow Such Empty!" />
         <div className="flex-1">
           <Link
             to="/"

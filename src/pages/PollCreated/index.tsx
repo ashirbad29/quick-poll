@@ -4,11 +4,13 @@ import toast from 'react-hot-toast';
 import getPoll from '../../services/getPoll';
 import { PollTypes } from '../../interfaces';
 import Spinner from '../../components/Spinner';
+import DoesNotExists from '../../components/DoesNotExists';
 
 const ORIGIN = window.location.origin;
 
 const PollCreated = () => {
   const [poll, setPoll] = useState<PollTypes>();
+  const [isPollExists, setPollExists] = useState(true);
 
   const { id: pollId } = useParams<{ id: string }>();
   const POLL_URL = `${ORIGIN}/poll/${pollId}`;
@@ -28,6 +30,8 @@ const PollCreated = () => {
         if (data) {
           setPoll(data);
           toast.success('Poll created');
+        } else {
+          setPollExists(false);
         }
       } catch {
         toast.error('something went wrong');
@@ -36,7 +40,15 @@ const PollCreated = () => {
     getPollData();
   }, [pollId]);
 
-  if (!poll) {
+  if (!isPollExists) {
+    return (
+      <div className="flex-1 bg-gray-100 items-center justify-center">
+        <DoesNotExists message="Poll doesn't exists" />
+      </div>
+    );
+  }
+
+  if (!poll && isPollExists) {
     return (
       <div className="flex-1 flex items-center justify-center">
         <Spinner height="28px" width="28px" />
