@@ -8,7 +8,7 @@ const Header = () => {
     <div className="py-16 flex justify-center border-dankPurple border-t-8 relative">
       <div className="flex flex-col items-center">
         <Link to="/" className="text-3xl font-bold">
-          Fast Poll{' '}
+          Quick Poll{' '}
           <span role="img" aria-label="emoji">
             ⚡
           </span>
